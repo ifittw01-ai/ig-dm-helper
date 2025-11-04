@@ -1,0 +1,172 @@
+================================================
+   ✅ 已修復！initialize IPC 處理器錯誤
+================================================
+
+🐛 錯誤原因
+-----------------------------------------
+
+### 錯誤消息
+
+```
+❌ Error invoking remote method 'initialize': 
+   Error: No handler registered for 'initialize'
+```
+
+### 問題分析
+
+在 `renderer.js` 中，對話框登入功能調用：
+- `ipcRenderer.invoke('initialize')`
+- `ipcRenderer.invoke('login', { username, password })`
+
+但是 `main.js` 中註冊的 IPC 處理器名稱是：
+- `ipcMain.handle('init-instagram', ...)`  ❌ 不匹配
+- `ipcMain.handle('login-instagram', ...)` ❌ 不匹配
+
+**結果**：找不到處理器，登入失敗！
+
+
+🔧 解決方案
+-----------------------------------------
+
+### 在 main.js 中添加別名處理器
+
+```javascript
+// 別名：initialize（用於對話框登入）
+ipcMain.handle('initialize', async () => {
+    return await initInstagram();
+});
+
+// 別名：login（用於對話框登入）
+ipcMain.handle('login', async (event, { username, password }) => {
+    return await loginInstagram(username, password);
+});
+```
+
+這樣：
+- ✅ `renderer.js` 調用 `initialize` → 執行 `initInstagram()`
+- ✅ `renderer.js` 調用 `login` → 執行 `loginInstagram()`
+- ✅ 原有的 `init-instagram` 和 `login-instagram` 仍然保留
+
+
+📊 修改位置
+-----------------------------------------
+
+**文件**：`main.js`
+**位置**：Line 251-259
+
+```javascript
+246|// 登入 Instagram
+247|ipcMain.handle('login-instagram', async (event, { username, password }) => {
+248|    return await loginInstagram(username, password);
+249|});
+250|
+251|// 別名：initialize（用於對話框登入）
+252|ipcMain.handle('initialize', async () => {
+253|    return await initInstagram();
+254|});
+255|
+256|// 別名：login（用於對話框登入）
+257|ipcMain.handle('login', async (event, { username, password }) => {
+258|    return await loginInstagram(username, password);
+259|});
+260|
+261|// 發送私訊
+262|ipcMain.handle('send-dm', async (event, { username, message }) => {
+```
+
+
+✅ 測試步驟
+-----------------------------------------
+
+### 1. 關閉程序
+
+如果程序還在運行：
+```bash
+按 Ctrl+C
+```
+
+### 2. 啟動程序
+
+```bash
+.\quick-fix.bat
+```
+
+### 3. 等待對話框
+
+大約 1.5 秒後，對話框自動彈出
+
+### 4. 輸入登入信息
+
+在對話框中：
+- **用戶名**：輸入你的 Instagram 用戶名（不帶 @）
+- **密碼**：輸入你的密碼
+
+### 5. 點擊登入
+
+點擊【🔐 登入】按鈕或按 Enter
+
+### 6. 觀察狀態
+
+應該看到：
+```
+🔄 正在登入...
+   ↓
+✅ 初始化成功，正在登入...
+   ↓
+✅ 登入成功！
+   ↓
+（對話框自動關閉）
+```
+
+
+💡 預期結果
+-----------------------------------------
+
+### 終端應該顯示
+
+```
+> ig-dm-helper@1.0.0 start
+> electron .
+數據庫連接成功
+🔍 开始检查登入状态...
+⚠️ 未登入，显示登入对话框...
+📢 创建登入对话框...
+✅ 登入对话框已显示在窗口中！
+用户点击了【🔐 登入】按钮
+正在初始化...
+✅ 初始化成功
+正在登入...
+✅ 登入成功！
+登入对话框已关闭
+```
+
+### 不會再出現
+
+❌ `Error: No handler registered for 'initialize'`
+
+
+🎉 總結
+-----------------------------------------
+
+### 修復前
+
+❌ 對話框無法登入
+❌ 顯示 "No handler registered" 錯誤
+❌ 需要手動去主畫面登入
+
+### 修復後
+
+✅ 對話框可以直接登入
+✅ 自動初始化和登入
+✅ 無需離開對話框
+✅ 簡單快速（3 步）
+
+
+================================================
+  更新日期：2025-11-01 | 版本：1.6.1
+  狀態：✅ 已修復並可測試
+================================================
+
+現在重新運行 .\quick-fix.bat 測試吧！ 🚀
+
+

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IG DM Helper - API 版本</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📱 IG DM Helper (API 版本)</h1>
+            <p class="subtitle">完全繞過瀏覽器，使用直接 HTTP 請求</p>
+        </header>
+
+        <!-- 登入區域 -->
+        <section class="login-section" id="loginSection">
+            <h2>🔐 Instagram 登入</h2>
+            <div class="login-form">
+                <input type="text" id="usernameInput" placeholder="Instagram 帳號" />
+                <input type="password" id="passwordInput" placeholder="密碼" />
+                <button id="btnLogin" class="btn btn-primary">登入</button>
+                <button id="btnCheckStatus" class="btn btn-secondary">檢查登入狀態</button>
+            </div>
+            <div id="loginStatus" class="status-message"></div>
+        </section>
+
+        <!-- 主功能區 -->
+        <section class="main-section" id="mainSection" style="display: none;">
+            <div class="user-info">
+                <span>已登入: <strong id="currentUsername">-</strong></span>
+                <button id="btnLogout" class="btn btn-small">登出</button>
+            </div>
+
+            <!-- 批量發送私訊 -->
+            <div class="panel">
+                <h2>💬 批量發送私訊</h2>
+                
+                <div class="form-group">
+                    <button id="btnImportAccounts" class="btn btn-secondary">匯入 IG 帳號 (TXT)</button>
+                    <span id="accountCount" class="info-text">已匯入 0 個帳號</span>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="messageInput" placeholder="輸入要發送的訊息..." rows="5"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button id="btnStartBatch" class="btn btn-primary">開始群發</button>
+                    <button id="btnPauseBatch" class="btn btn-warning" disabled>暫停</button>
+                    <button id="btnResumeBatch" class="btn btn-success" disabled>繼續</button>
+                    <button id="btnStopBatch" class="btn btn-danger" disabled>停止</button>
+                </div>
+
+                <div id="progressInfo" class="progress-info"></div>
+
+                <!-- 任務列表 -->
+                <div class="task-list">
+                    <h3>任務列表</h3>
+                    <div id="taskListContainer"></div>
+                </div>
+            </div>
+
+            <!-- 匯出粉絲 -->
+            <div class="panel">
+                <h2>👥 匯出粉絲</h2>
+                
+                <div class="form-group">
+                    <input type="text" id="followersUsername" placeholder="輸入 Instagram 帳號名稱" />
+                    <input type="number" id="maxFollowers" placeholder="最多抓取數量" value="1000" min="1" max="10000" />
+                </div>
+
+                <button id="btnFetchFollowers" class="btn btn-secondary">開始匯出</button>
+                
+                <div id="followersProgress" class="progress-info"></div>
+            </div>
+
+            <!-- 歷史記錄 -->
+            <div class="panel">
+                <h2>📜 歷史記錄</h2>
+                <button id="btnLoadHistory" class="btn btn-secondary">載入歷史記錄</button>
+                <button id="btnClearHistory" class="btn btn-danger">清除歷史記錄</button>
+                <div id="historyContainer" class="history-container"></div>
+            </div>
+        </section>
+    </div>
+
+    <script src="renderer-api.js"></script>
+</body>
+</html>
+
