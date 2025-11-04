@@ -582,8 +582,22 @@ function askUserToSend(username, index, total) {
                 recordBtn.style.background = '#6c757d';
                 recordBtn.style.cursor = 'not-allowed';
                 
-                const userLink = `https://www.instagram.com/${username}/`;
-                const result = await ipcRenderer.invoke('record-user-link', { username, link: userLink });
+                // 清理用戶名
+                let cleanUsername = username;
+                // 移除 @ 符號
+                cleanUsername = cleanUsername.replace(/^@+/, '');
+                // 如果是完整的 Instagram URL，提取用戶名
+                if (cleanUsername.includes('instagram.com/')) {
+                    const match = cleanUsername.match(/instagram\.com\/([^/?]+)/);
+                    if (match) {
+                        cleanUsername = match[1];
+                    }
+                }
+                // 移除前後斜杠
+                cleanUsername = cleanUsername.replace(/^\/+|\/+$/g, '');
+                
+                const userLink = `https://www.instagram.com/${cleanUsername}/`;
+                const result = await ipcRenderer.invoke('record-user-link', { username: cleanUsername, link: userLink });
                 
                 if (result.success) {
                     recordBtn.textContent = '✅ 已記錄';
