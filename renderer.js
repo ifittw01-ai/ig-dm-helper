@@ -964,7 +964,9 @@ async function exportFollowers() {
             });
             
             if (!saveResult.canceled) {
-                fs.writeFileSync(saveResult.filePath, result.followers.join('\n'), 'utf8');
+                // 將用戶名轉換為完整的 Instagram 鏈接
+                const followerLinks = result.followers.map(username => `https://www.instagram.com/${username}/`);
+                fs.writeFileSync(saveResult.filePath, followerLinks.join('\n'), 'utf8');
                 
                 let summaryMsg = `成功匯出 ${result.count} 個粉絲到：\n${saveResult.filePath}`;
                 if (result.totalScanned && result.totalScanned > result.count) {
