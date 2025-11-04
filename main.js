@@ -574,3 +574,66 @@ app.on('before-quit', async () => {
         await db.close();
     }
 });
+
+// 全局錯誤處理 - 防止崩潰
+process.on('uncaughtException', (error) => {
+    console.error('❌ 未捕獲的異常:', error);
+    console.error('堆棧追蹤:', error.stack);
+    
+    // 嘗試保存 session
+    if (igAPI) {
+        try {
+            saveSession();
+        } catch (e) {
+            console.error('保存 session 失敗:', e);
+        }
+    }
+    
+    // 彈出錯誤對話框（如果主窗口存在）
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        dialog.showErrorBox(
+            '應用程式錯誤',
+            `發生了一個錯誤，但應用程式將繼續運行。\n\n錯誤信息：${error.message}\n\n建議：\n1. 保存當前工作\n2. 重新啟動應用程式\n3. 如果問題持續，請減少併發請求數量`
+        );
+    }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ 未處理的 Promise 拒絕:', reason);
+    console.error('Promise:', promise);
+    
+    // 如果是網絡錯誤，記錄但不崩潰
+    if (reason && reason.message && reason.message.includes('ETIMEDOUT')) {
+        console.warn('⚠️ 網絡超時，將繼續運行');
+        return;
+    }
+});
+
+// Electron 渲染進程崩潰處理
+app.on('render-process-gone', (event, webContents, details) => {
+    console.error('❌ 渲染進程崩潰:', details);
+    
+    if (details.reason === 'crashed') {
+        dialog.showMessageBox({
+            type: 'error',
+            title: '程式崩潰',
+            message: '渲染進程崩潰，應用程式將重新啟動。',
+            buttons: ['重新啟動', '退出']
+        }).then(result => {
+            if (result.response === 0) {
+                // 重新創建窗口
+                if (mainWindow) {
+                    mainWindow.close();
+                }
+                createWindow();
+            } else {
+                app.quit();
+            }
+        });
+    }
+});
+
+// 子進程崩潰處理
+app.on('child-process-gone', (event, details) => {
+    console.error('❌ 子進程崩潰:', details);
+});
