@@ -496,15 +496,16 @@ function askUserToSend(username, index, total) {
                 </p>
                 <div style="display: flex; gap: 10px; justify-content: center;">
                     <button id="btn-send" style="
-                        background: #0095f6;
-                        color: white;
+                        background: #cccccc;
+                        color: #666666;
                         border: none;
                         padding: 12px 30px;
                         border-radius: 8px;
-                        cursor: pointer;
+                        cursor: not-allowed;
                         font-size: 14px;
                         font-weight: 600;
-                    ">✅ 可以發送</button>
+                        opacity: 0.6;
+                    " disabled>🔒 可以發送（已鎖定）</button>
                     <button id="btn-skip" style="
                         background: #ffc107;
                         color: white;
@@ -543,10 +544,9 @@ function askUserToSend(username, index, total) {
         document.body.appendChild(overlay);
         document.body.appendChild(dialog);
         
+        // 🔒 發送按鈕已鎖定，不做任何事
         dialog.querySelector('#btn-send').onclick = () => {
-            document.body.removeChild(dialog);
-            document.body.removeChild(overlay);
-            resolve('send');
+            // 按鈕已禁用，不執行任何操作
         };
         
         dialog.querySelector('#btn-skip').onclick = () => {

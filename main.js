@@ -386,10 +386,37 @@ ipcMain.handle('send-single-dm', async (event, { username, message }) => {
     }
 });
 
-// 在瀏覽器中打開外部鏈接
+// 在瀏覽器中打開外部鏈接（✅ 改進：重複使用同一個窗口）
+let instagramWindow = null; // 存儲 Instagram 瀏覽器窗口引用
+
 ipcMain.handle('open-external-url', async (event, url) => {
     try {
-        await shell.openExternal(url);
+        // 如果已經有打開的 Instagram 窗口，重複使用
+        if (instagramWindow && !instagramWindow.isDestroyed()) {
+            console.log('重複使用現有瀏覽器窗口');
+            instagramWindow.loadURL(url);
+            instagramWindow.focus(); // 聚焦到該窗口
+        } else {
+            // 第一次打開或窗口已關閉，創建新窗口
+            console.log('創建新的瀏覽器窗口');
+            instagramWindow = new BrowserWindow({
+                width: 1200,
+                height: 900,
+                webPreferences: {
+                    nodeIntegration: false,
+                    contextIsolation: true
+                },
+                title: 'Instagram - 用戶檢查'
+            });
+            
+            instagramWindow.loadURL(url);
+            
+            // 窗口關閉時清空引用
+            instagramWindow.on('closed', () => {
+                instagramWindow = null;
+            });
+        }
+        
         return { success: true };
     } catch (error) {
         console.error('打開鏈接失敗:', error);
