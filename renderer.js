@@ -941,19 +941,48 @@ async function exportFollowers() {
         });
         
         if (result.success && result.followers) {
-            // 顯示完成信息
+            // 顯示完成信息（使用實際抓取數量）
             let completeMsg = `✅ 抓取完成！`;
-            if (result.range && (result.range.start > 1 || result.range.end)) {
-                completeMsg += ` (${result.range.start}-${result.range.end})`;
+            if (result.range) {
+                const actualEnd = result.range.actualEnd || result.totalScanned;
+                if (result.range.start > 1 || result.range.end) {
+                    // 显示实际抓取的范围
+                    completeMsg += ` (實際: ${result.range.start}-${actualEnd}`;
+                    if (end && actualEnd < end) {
+                        completeMsg += `，目標: ${start || 1}-${end})`;
+                    } else {
+                        completeMsg += `)`;
+                    }
+                }
             }
             elements.exportStatus.textContent = completeMsg;
             elements.exportCount.textContent = result.count;
             elements.exportTotal.textContent = result.totalScanned || result.count;
             
+            // 檢查是否被限制並警告用戶
+            if (result.warning || result.isLimited || result.prematureEnd) {
+                const warningMsg = `⚠️ 檢測到異常情況：\n\n` +
+                    `目標抓取：${start || 1} - ${end || '全部'}\n` +
+                    `實際抓取：${result.totalScanned} 個\n` +
+                    `符合條件：${result.count} 個\n\n` +
+                    `${result.warning || '抓取提前終止'}\n\n` +
+                    `可能原因：\n` +
+                    `1. 賬號被 Instagram 限制\n` +
+                    `2. API 訪問受限\n` +
+                    `3. 該用戶的粉絲數少於預期\n\n` +
+                    `建議：\n` +
+                    `- 等待 24 小時後再試\n` +
+                    `- 更換賬號\n` +
+                    `- 減少抓取數量`;
+                
+                alert(warningMsg);
+            }
+            
             // 選擇保存位置
             let filename = `${username}_粉絲_${getDateString()}`;
             if (start || end) {
-                filename += `_${start || '1'}-${end || 'end'}`;
+                const actualEnd = result.range?.actualEnd || result.totalScanned;
+                filename += `_${start || '1'}-${actualEnd}`;
             }
             
             const saveResult = await dialog.showSaveDialog({
@@ -971,6 +1000,9 @@ async function exportFollowers() {
                 let summaryMsg = `成功匯出 ${result.count} 個粉絲到：\n${saveResult.filePath}`;
                 if (result.totalScanned && result.totalScanned > result.count) {
                     summaryMsg += `\n\n（共掃描 ${result.totalScanned} 個粉絲）`;
+                }
+                if (result.isLimited || result.prematureEnd) {
+                    summaryMsg += `\n\n⚠️ 警告：實際抓取數量少於預期，賬號可能被限制`;
                 }
                 alert(summaryMsg);
             }

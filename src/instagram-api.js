@@ -547,15 +547,28 @@ class InstagramAPI {
                 }
             }
 
+            // 检测是否被限制（实际抓取数量远少于预期）
+            const isLimited = (end > 0 && totalFetched < end * 0.5) || 
+                             (targetCount > 0 && totalFetched < targetCount * 0.5);
+            
+            // 检测是否提前终止（没有达到目标但停止了）
+            const prematureEnd = (end > 0 && totalFetched < end && !hasMore) ||
+                                (targetCount > 0 && totalFetched < targetCount && !hasMore);
+            
             return {
                 success: true,
                 followers: followers.map(f => f.username),
                 count: followers.length,
                 totalScanned: totalFetched,
+                actualEnd: totalFetched, // 实际抓取到第几个
                 range: {
                     start: start,
-                    end: end > 0 ? end : totalFetched
-                }
+                    end: end > 0 ? end : totalFetched,
+                    actualEnd: totalFetched // 实际结束位置
+                },
+                warning: isLimited || prematureEnd ? '⚠️ 账号可能被限制，实际抓取数量少于预期' : null,
+                isLimited: isLimited,
+                prematureEnd: prematureEnd
             };
         } catch (error) {
             return {
