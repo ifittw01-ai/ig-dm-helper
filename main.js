@@ -518,6 +518,31 @@ ipcMain.handle('save-session', async () => {
     return { success: true };
 });
 
+// 記錄用戶鏈接到文本文件
+ipcMain.handle('record-user-link', async (event, { username, link }) => {
+    try {
+        const recordFilePath = path.join(__dirname, 'recorded-users.txt');
+        const recordLine = `${link}\n`;
+        
+        // 追加到文件
+        fs.appendFileSync(recordFilePath, recordLine, 'utf8');
+        
+        console.log(`✅ 已記錄用戶: @${username} -> ${link}`);
+        
+        return { 
+            success: true, 
+            message: '已記錄到 recorded-users.txt',
+            filePath: recordFilePath
+        };
+    } catch (error) {
+        console.error('記錄用戶鏈接失敗:', error);
+        return { 
+            success: false, 
+            error: error.message 
+        };
+    }
+});
+
 // 應用生命週期
 app.whenReady().then(async () => {
     await initDatabase();

@@ -494,7 +494,7 @@ function askUserToSend(username, index, total) {
                 <p style="margin: 0 0 20px 0; color: #666; font-size: 14px;">
                     查看是否有【訊息】或【Message】按鈕
                 </p>
-                <div style="display: flex; gap: 10px; justify-content: center;">
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                     <button id="btn-send" style="
                         background: #cccccc;
                         color: #666666;
@@ -526,6 +526,18 @@ function askUserToSend(username, index, total) {
                         font-size: 14px;
                         font-weight: 600;
                     ">🛑 停止</button>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button id="btn-record" style="
+                        background: #28a745;
+                        color: white;
+                        border: none;
+                        padding: 12px 30px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                    ">📝 記錄下來</button>
                 </div>
             </div>
         `;
@@ -559,6 +571,48 @@ function askUserToSend(username, index, total) {
             document.body.removeChild(dialog);
             document.body.removeChild(overlay);
             resolve('stop');
+        };
+        
+        // 記錄按鈕：保存用戶鏈接到文本文件
+        dialog.querySelector('#btn-record').onclick = async () => {
+            try {
+                const recordBtn = dialog.querySelector('#btn-record');
+                recordBtn.disabled = true;
+                recordBtn.textContent = '⏳ 記錄中...';
+                recordBtn.style.background = '#6c757d';
+                recordBtn.style.cursor = 'not-allowed';
+                
+                const userLink = `https://www.instagram.com/${username}/`;
+                const result = await ipcRenderer.invoke('record-user-link', { username, link: userLink });
+                
+                if (result.success) {
+                    recordBtn.textContent = '✅ 已記錄';
+                    recordBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                        recordBtn.textContent = '📝 記錄下來';
+                        recordBtn.style.background = '#28a745';
+                        recordBtn.style.cursor = 'pointer';
+                        recordBtn.disabled = false;
+                    }, 1500);
+                } else {
+                    alert('記錄失敗：' + result.error);
+                    recordBtn.textContent = '❌ 記錄失敗';
+                    recordBtn.style.background = '#dc3545';
+                    setTimeout(() => {
+                        recordBtn.textContent = '📝 記錄下來';
+                        recordBtn.style.background = '#28a745';
+                        recordBtn.style.cursor = 'pointer';
+                        recordBtn.disabled = false;
+                    }, 1500);
+                }
+            } catch (error) {
+                alert('記錄失敗：' + error.message);
+                const recordBtn = dialog.querySelector('#btn-record');
+                recordBtn.textContent = '📝 記錄下來';
+                recordBtn.style.background = '#28a745';
+                recordBtn.style.cursor = 'pointer';
+                recordBtn.disabled = false;
+            }
         };
     });
 }
