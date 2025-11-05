@@ -12,7 +12,6 @@ let currentTaskIndex = 0;
 const elements = {
     // 初始化和登入
     initSection: document.getElementById('initSection'),
-    initBtn: document.getElementById('initBtn'),
     loginBtn: document.getElementById('loginBtn'),
     usernameInput: document.getElementById('usernameInput'),
     passwordInput: document.getElementById('passwordInput'),
@@ -62,8 +61,7 @@ const elements = {
 
 // 初始化事件監聽
 function initEventListeners() {
-    // 初始化和登入按鈕
-    elements.initBtn.addEventListener('click', initInstagram);
+    // 登入按鈕
     elements.loginBtn.addEventListener('click', loginInstagram);
     
     // Enter 鍵登入
