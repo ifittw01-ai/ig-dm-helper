@@ -20,7 +20,7 @@
     "followers",
     "marketing"
   ],
-  "author": "FlowCube",
+  "author": "",
   "license": "MIT",
   "dependencies": {
     "@electron/remote": "^2.1.0",
@@ -35,7 +35,7 @@
     "electron-rebuild": "^3.2.9"
   },
   "build": {
-    "appId": "com.flowcube.igdmhelper",
+    "appId": "com.igdmhelper.app",
     "productName": "IG DM Helper",
     "directories": {
       "output": "dist"

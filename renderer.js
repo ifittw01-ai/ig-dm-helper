@@ -18,15 +18,10 @@ const elements = {
     passwordInput: document.getElementById('passwordInput'),
     mainSection: document.getElementById('mainSection'),
     
-    // 訊息輸入
-    messageInput: document.getElementById('messageInput'),
-    charCount: document.getElementById('charCount'),
-    
     // 按鈕
     importBtn: document.getElementById('importBtn'),
     startBtn: document.getElementById('startBtn'),
     exportFollowersBtn: document.getElementById('exportFollowersBtn'),
-    saveCookiesBtn: document.getElementById('saveCookiesBtn'),
     pauseBtn: document.getElementById('pauseBtn'),
     resumeBtn: document.getElementById('resumeBtn'),
     stopBtn: document.getElementById('stopBtn'),
@@ -78,14 +73,10 @@ function initEventListeners() {
         }
     });
     
-    // 訊息輸入
-    elements.messageInput.addEventListener('input', updateCharCount);
-    
     // 功能按鈕
     elements.importBtn.addEventListener('click', importAccounts);
     elements.startBtn.addEventListener('click', startBatchDM);
     elements.exportFollowersBtn.addEventListener('click', showExportModal);
-    elements.saveCookiesBtn.addEventListener('click', saveCookies);
     
     // 控制按鈕
     elements.pauseBtn.addEventListener('click', pauseTasks);
@@ -637,12 +628,6 @@ async function startBatchDM() {
         return;
     }
     
-    const message = elements.messageInput.value.trim();
-    if (!message) {
-        alert('請輸入訊息文案');
-        return;
-    }
-    
     // 檢查登入狀態
     try {
         const loginStatus = await ipcRenderer.invoke('check-login-status');
@@ -749,12 +734,12 @@ async function startBatchDM() {
                     continue;
                 }
                 
-                // 3. 發送訊息
+                // 3. 發送訊息（不再需要 message 參數）
                 updateStatus('📤 發送中', `正在向 @${username} 發送訊息...`);
                 
                 const result = await ipcRenderer.invoke('send-single-dm', {
                     username: username,
-                    message: message
+                    message: '' // 空字串，實際上不會發送訊息
                 });
                 
                 if (result.success) {
@@ -1020,20 +1005,6 @@ async function exportFollowers() {
     }
 }
 
-// 保存 Cookies
-async function saveCookies() {
-    showLoading('正在保存登入狀態...');
-    
-    try {
-        await ipcRenderer.invoke('save-session');
-        hideLoading();
-        alert('✅ 登入狀態已保存！\n下次啟動時將自動登入。');
-    } catch (error) {
-        hideLoading();
-        alert('保存失敗：' + error.message);
-    }
-}
-
 // 渲染任務列表
 // 更新單個任務的狀態
 function updateTaskStatus(index, status, error = null) {
@@ -1130,12 +1101,6 @@ function updateStatus(indicator, text) {
     elements.statusText.textContent = text;
 }
 
-// 更新字數統計
-function updateCharCount() {
-    const count = elements.messageInput.value.length;
-    elements.charCount.textContent = count;
-}
-
 // 顯示載入遮罩
 function showLoading(text = '處理中...') {
     elements.loadingText.textContent = text;
@@ -1216,7 +1181,6 @@ ipcRenderer.on('followers-progress', (event, data) => {
 // 初始化
 document.addEventListener('DOMContentLoaded', async () => {
     initEventListeners();
-    updateCharCount();
     
     // 启动时检查登入状态
     await checkLoginOnStartup();

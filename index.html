@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IG 私訊助手 & 抓粉 - FlowCube</title>
+    <title>IG 私訊助手</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo-container">
-                <img src="assets/logo.png" alt="FlowCube Logo" class="logo">
-            </div>
-            <h1>IG 私訊助手 & 抓粉</h1>
-            <p class="subtitle">Instagram Direct Message & Followers Export Tool</p>
+            <h1>IG 私訊助手</h1>
         </header>
 
         <!-- 登入區 -->
@@ -54,22 +50,12 @@
 
         <!-- 主要功能區 -->
         <div class="main-section" id="mainSection" style="display: none;">
-            <!-- 訊息編輯器 -->
-            <div class="message-section">
-                <label for="messageInput">📝 訊息文案</label>
-                <textarea 
-                    id="messageInput" 
-                    class="message-input" 
-                    placeholder="在這裡輸入要群發的訊息文案...&#10;&#10;支援多行文字&#10;可以包含 Emoji 😊"
-                    rows="6"
-                ></textarea>
-                <div class="char-count">
-                    字數：<span id="charCount">0</span>
-                </div>
-            </div>
-
             <!-- 操作按鈕組 -->
             <div class="button-grid">
+                <button class="btn btn-secondary" id="exportFollowersBtn">
+                    <span class="icon">👥</span>
+                    匯出粉絲
+                </button>
                 <button class="btn btn-secondary" id="importBtn">
                     <span class="icon">📥</span>
                     匯入 IG 帳號
@@ -77,14 +63,6 @@
                 <button class="btn btn-primary" id="startBtn">
                     <span class="icon">▶️</span>
                     開始群發
-                </button>
-                <button class="btn btn-secondary" id="exportFollowersBtn">
-                    <span class="icon">👥</span>
-                    匯出粉絲
-                </button>
-                <button class="btn btn-secondary" id="saveCookiesBtn">
-                    <span class="icon">💾</span>
-                    保存登入狀態
                 </button>
             </div>
 
@@ -149,15 +127,6 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <div class="footer-brand">
-                <p>📦 流量魔方 FlowCube</p>
-                <a href="https://line.me/R/ti/p/@flowcube" target="_blank">
-                    🔗 https://line.me/R/ti/p/@flowcube
-                </a>
-            </div>
-            <div class="footer-version">
-                v1.0.0 | Made with ❤️ by FlowCube
-            </div>
         </footer>
     </div>
 
